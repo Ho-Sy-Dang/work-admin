@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMS - Student Management</title>
+
+    <link rel="stylesheet" href="../css/Home.css">
+    <link rel="stylesheet" href="../css/SMS.css">
+</head>
+<body>
+
+<header>
+
+    <div class="logo">ADMIN</div>
+
+    <nav>
+        <a href="Home.html">Home</a>
+        <a href="Add.html">Add</a>
+        <a class="active" href="SMS.html">SMS</a>
+        <a href="History.html">History</a>
+        <a href="Account.html">Account</a>
+    </nav>
+
+</header>
+
+<div class="container">
+
+    <h1>Student Management</h1>
+    <p>Manage your classes and students.</p>
+
+    <div class="sms-tabs">
+        <button class="btn btn-primary" id="tab-classes">Classes</button>
+        <button class="btn btn-secondary" id="tab-students">Students</button>
+    </div>
+
+    <!-- ===================== CLASSES TAB ===================== -->
+    <div class="sms-section" id="section-classes">
+
+        <div class="action-bar" style="padding-bottom: 20px;">
+            <button class="btn btn-primary" id="btn-add-class">+ Add Class</button>
+        </div>
+
+        <div id="classes-container"></div>
+
+        <div class="empty-card" id="classes-empty" style="display:none;">
+            <h2>🏫</h2>
+            <h3>Chưa có lớp nào</h3>
+        </div>
+
+    </div>
+
+    <!-- ===================== STUDENTS TAB ===================== -->
+    <div class="sms-section" id="section-students" style="display:none;">
+
+        <input type="text" class="search-box" id="input-students-search" placeholder="🔍 Tìm học sinh...">
+
+        <div id="students-container"></div>
+
+        <div class="empty-card" id="students-empty" style="display:none;">
+            <h2>🧑‍🎓</h2>
+            <h3>Chưa có học sinh nào đăng nhập vào Web User</h3>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ===================== MODAL: TẠO / SỬA LỚP ===================== -->
+<div class="modal-overlay" id="modal-class-form">
+    <div class="modal-box" style="max-width: 480px;">
+
+        <!-- Bước 1: Tên lớp (chỉ hiện khi tạo mới) -->
+        <div id="step-class-name">
+            <h3 style="margin-bottom: 15px;">Tên lớp mới</h3>
+            <input type="text" id="input-new-class-name" placeholder="Ví dụ: Lớp 6A1...">
+            <div class="action-bar" style="justify-content:flex-end; padding-bottom:0;">
+                <button class="btn btn-secondary" id="btn-class-name-cancel">Cancel</button>
+                <button class="btn btn-primary" id="btn-class-name-next">Next</button>
+            </div>
+        </div>
+
+        <!-- Bước 2: Chọn học sinh -->
+        <div id="step-class-students" style="display:none;">
+            <h3 id="class-students-title" style="margin-bottom: 10px;"></h3>
+            <input type="text" class="search-box" id="input-class-student-search" placeholder="🔍 Tìm học sinh...">
+            <div class="student-pick-list" id="class-student-list"></div>
+            <div class="action-bar" style="justify-content:flex-end; padding-bottom:0;">
+                <button class="btn btn-secondary" id="btn-class-students-back">Back</button>
+                <button class="btn btn-success" id="btn-class-students-save">Add</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ===================== MODAL: XEM CHI TIẾT LỚP ===================== -->
+<div class="modal-overlay" id="modal-class-view">
+    <div class="modal-box" style="max-width: 520px;">
+
+        <h3 id="class-view-title" style="color:#0099ff; margin-bottom: 15px;"></h3>
+
+        <div id="class-view-students" style="max-height:320px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; margin-bottom:20px;"></div>
+
+        <div class="empty-card" id="class-view-empty" style="display:none; margin: 0 0 20px 0; width:auto;">
+            <h3>Lớp chưa có học sinh nào</h3>
+        </div>
+
+        <div class="action-bar" style="justify-content:flex-end; padding-bottom:0;">
+            <button class="btn btn-danger" id="btn-class-view-delete">Delete Class</button>
+            <button class="btn btn-secondary" id="btn-class-view-close">Back</button>
+            <button class="btn btn-primary" id="btn-class-view-edit">Edit</button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ===================== MODAL: CHI TIẾT HỌC SINH ===================== -->
+<div class="modal-overlay" id="modal-student-detail">
+    <div class="modal-box" style="max-width: 480px;">
+
+        <h3 id="detail-student-name" style="margin-bottom: 4px;"></h3>
+        <p id="detail-student-class" style="color:#777; margin-bottom: 4px;"></p>
+        <p id="detail-student-admin" style="color:#777; margin-bottom: 16px;"></p>
+
+        <h4 style="margin-bottom: 10px; color:#333;">Yêu cầu đổi tên</h4>
+        <div id="detail-requests-list" style="display:flex; flex-direction:column; gap:10px; max-height:280px; overflow-y:auto; margin-bottom: 16px;"></div>
+
+        <h4 style="margin-bottom: 10px; color:#333;">📚 Bài tập đã giao</h4>
+        <div id="detail-assignments-list" style="display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto; margin-bottom: 16px;"></div>
+
+        <div class="action-bar" style="justify-content:flex-end; padding-bottom:0;">
+            <button class="btn btn-secondary" id="detail-btn-close">Close</button>
+        </div>
+
+    </div>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script src="../firebase/firebase.js"></script>
+<script src="../firebase/auth.js"></script>
+
+<script src="../js/SMS.js"></script>
+
+</body>
+</html>

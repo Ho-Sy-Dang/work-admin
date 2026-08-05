@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History</title>
+
+    <link rel="stylesheet" href="../css/Home.css">
+    <link rel="stylesheet" href="../css/History.css">
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">ADMIN</div>
+
+    <nav>
+        <a href="Home.html">Home</a>
+        <a href="Add.html">Add</a>
+        <a href="SMS.html">SMS</a>
+        <a class="active" href="History.html">History</a>
+        <a href="Account.html">Account</a>
+    </nav>
+
+</header>
+
+<div class="container">
+
+    <h1>History</h1>
+
+    <div id="history-list"></div>
+
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script src="../firebase/firebase.js"></script>
+<script src="../firebase/auth.js"></script>
+
+<script src="../js/History.js"></script>
+
+</body>
+</html>

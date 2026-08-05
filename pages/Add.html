@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Homework</title>
+
+    <link rel="stylesheet" href="../css/Home.css">
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+    <script src="../firebase/firebase.js"></script>
+    <script src="../firebase/auth.js"></script>
+    <script src="../firebase/upload.js"></script>
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        ADMIN
+    </div>
+
+    <nav>
+
+        <a href="Home.html">Home</a>
+
+        <a class="active" href="Add.html">Add</a>
+
+        <a href="SMS.html">SMS</a>
+
+        <a href="History.html">History</a>
+
+        <a href="Account.html">Account</a>
+
+    </nav>
+
+</header>
+
+<div class="container">
+
+    <h1>Add Homework</h1>
+
+    <p>Create a new homework.</p>
+
+    <!-- ============================================================
+         TAB LỚN (cấp 1): Riêng / Chung
+         - Riêng  : bài tập cá nhân, Reading có 2 vùng nhập riêng biệt
+                    (Question + Reading).
+         - Chung  : bài tập dùng đề chung, Reading chỉ có 1 vùng nhập
+                    duy nhất "Đề Bài" (đoạn văn/ảnh + trắc nghiệm).
+         Listening giữ nguyên cấu trúc như nhau ở cả 2 tab.
+    ============================================================= -->
+    <div class="mode-selector" id="mode-selector">
+
+        <button type="button" class="mode-btn active" id="btn-mode-private" data-mode="private">
+            🔒 Riêng
+        </button>
+
+        <button type="button" class="mode-btn" id="btn-mode-shared" data-mode="shared">
+            🌐 Chung
+        </button>
+
+    </div>
+
+    <!-- TAB NHỎ (cấp 2): Reading / Listening - quyết định cấu trúc bài tập -->
+    <div class="type-selector" id="section-selector">
+
+        <button type="button" class="type-btn active" id="btn-section-reading" data-section="reading">
+            📖 Reading
+        </button>
+
+        <button type="button" class="type-btn" id="btn-section-listening" data-section="listening">
+            🎧 Listening
+        </button>
+
+    </div>
+
+    <!-- Chọn loại nội dung: Ảnh hoặc Chữ - áp dụng cho vùng nhập đang hiển thị -->
+    <div class="type-selector" id="type-selector">
+
+        <button type="button" class="type-btn active" id="btn-type-image" data-type="image">
+            🖼️ Ảnh
+        </button>
+
+        <button type="button" class="type-btn" id="btn-type-text" data-type="text">
+            📝 Chữ
+        </button>
+
+    </div>
+
+    <div class="page-header">
+
+        <h2 id="part-title">
+
+            Part 1 / 5
+
+        </h2>
+
+        <div class="progress-container">
+
+            <div
+                class="progress-bar"
+                id="progress-bar">
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ============================================================
+         RIÊNG -> READING: 2 vùng nhập riêng biệt (Question + Reading)
+    ============================================================= -->
+    <div id="reading-private-fields">
+
+        <!-- Chế độ Ảnh -->
+        <div class="workspace" id="workspace-image">
+
+            <!-- Question -->
+            <div class="upload-card" id="card-question">
+
+                <input
+                    type="file"
+                    id="input-question"
+                    accept="image/*"
+                    hidden
+                >
+
+                <div class="upload-placeholder">
+
+                    <svg viewBox="0 0 24 24" width="60" height="60" fill="#2196f3">
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"/>
+                    </svg>
+
+                    <h3>Question</h3>
+
+                    <p>Click hoặc Ctrl + V</p>
+
+                </div>
+
+                <div class="preview"></div>
+
+            </div>
+
+            <!-- Reading -->
+            <div class="upload-card" id="card-reading">
+
+                <input
+                    type="file"
+                    id="input-reading"
+                    accept="image/*"
+                    hidden
+                >
+
+                <div class="upload-placeholder">
+
+                    <svg viewBox="0 0 24 24" width="60" height="60" fill="#2196f3">
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"/>
+                    </svg>
+
+                    <h3>Reading</h3>
+
+                    <p>Click hoặc Ctrl + V</p>
+
+                </div>
+
+                <div class="preview"></div>
+
+            </div>
+
+        </div>
+
+        <!-- Chế độ Chữ -->
+        <div class="workspace" id="workspace-text">
+
+            <div class="text-card">
+
+                <h3 class="text-card-title">Question</h3>
+
+                <textarea
+                    id="text-question"
+                    class="reading-textarea"
+                    placeholder="Dán nội dung câu hỏi vào đây (Ctrl + V)..."></textarea>
+
+            </div>
+
+            <div class="text-card">
+
+                <h3 class="text-card-title">Reading</h3>
+
+                <textarea
+                    id="text-reading"
+                    class="reading-textarea"
+                    placeholder="Dán nội dung bài đọc vào đây (Ctrl + V)..."></textarea>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ============================================================
+         CHUNG -> READING: chỉ 1 vùng nhập duy nhất "Đề Bài"
+         (đoạn văn/hình ảnh + trắc nghiệm ở phần Đáp án đúng bên dưới)
+    ============================================================= -->
+    <div id="reading-shared-fields" style="display:none;">
+
+        <!-- Chế độ Ảnh -->
+        <div class="task-workspace" id="exam-workspace-image">
+
+            <div class="upload-card" id="card-exam">
+
+                <input
+                    type="file"
+                    id="input-exam"
+                    accept="image/*"
+                    hidden
+                >
+
+                <div class="upload-placeholder">
+
+                    <svg viewBox="0 0 24 24" width="60" height="60" fill="#2196f3">
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"/>
+                    </svg>
+
+                    <h3>Đề Bài</h3>
+
+                    <p>Click hoặc Ctrl + V</p>
+
+                </div>
+
+                <div class="preview"></div>
+
+            </div>
+
+        </div>
+
+        <!-- Chế độ Chữ -->
+        <div class="task-workspace" id="exam-workspace-text">
+
+            <div class="text-card">
+
+                <h3 class="text-card-title">Đề Bài</h3>
+
+                <textarea
+                    id="text-exam"
+                    class="reading-textarea"
+                    placeholder="Dán đề bài (đoạn văn / mô tả ảnh) vào đây (Ctrl + V)..."></textarea>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ============================================================
+         LISTENING (dùng chung cho cả Riêng và Chung) - giữ nguyên
+         toàn bộ: file nghe (mp3/mp4) + Đề bài (Ảnh hoặc Chữ)
+    ============================================================= -->
+    <div id="listening-fields" style="display:none;">
+
+        <!-- File nghe (mp3/mp4) - nằm phía trên, dài và mỏng -->
+        <div class="audio-upload-card" id="audio-upload-card">
+
+            <input
+                type="file"
+                id="input-audio"
+                accept="audio/*,video/*"
+                hidden
+            >
+
+            <div class="audio-placeholder" id="audio-placeholder">
+                🎵 Click để chọn file nghe (mp3 / mp4) hoặc Ctrl + V
+            </div>
+
+            <div class="audio-player-wrap" id="audio-player-wrap" style="display:none;">
+                <div id="audio-player-slot"></div>
+                <button type="button" class="btn-remove-audio" id="btn-remove-audio">🗑️ Xóa file</button>
+            </div>
+
+        </div>
+
+        <!-- Đề bài (task) - Ảnh hoặc Chữ, dùng chung toggle với type-selector ở trên -->
+        <div class="task-workspace" id="task-workspace-image">
+
+            <div class="upload-card" id="card-task">
+
+                <input
+                    type="file"
+                    id="input-task"
+                    accept="image/*"
+                    hidden
+                >
+
+                <div class="upload-placeholder">
+
+                    <svg viewBox="0 0 24 24" width="60" height="60" fill="#2196f3">
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"/>
+                    </svg>
+
+                    <h3>Đề bài (ảnh)</h3>
+
+                    <p>Click hoặc Ctrl + V</p>
+
+                </div>
+
+                <div class="preview"></div>
+
+            </div>
+
+        </div>
+
+        <div class="task-workspace" id="task-workspace-text">
+
+            <div class="text-card">
+
+                <h3 class="text-card-title">Đề bài</h3>
+
+                <textarea
+                    id="text-task"
+                    class="reading-textarea"
+                    placeholder="Dán đề bài vào đây (Ctrl + V)..."></textarea>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ============================================================
+         FILL IN THE BLANKS (chỉ áp dụng cho Reading - cả Riêng và Chung)
+         Admin bật/tắt tính năng này cho từng Part. Khi bật, bài tập gửi
+         sang User sẽ có thêm phần điền vào chỗ trống bên cạnh trắc nghiệm.
+    ============================================================= -->
+    <div class="fillin-toggle-section" id="fillin-toggle-section" style="display:none;">
+
+        <button type="button" class="btn-fillin-toggle" id="btn-fillin-toggle">
+            ✏️ Fill in the blanks
+        </button>
+
+    </div>
+
+    <div class="fillin-config-section" id="fillin-config-section" style="display:none;">
+
+        <div class="answer-key-header">
+
+            <h3>📝 Điền vào chỗ trống</h3>
+
+            <div class="answer-count-control">
+
+                <button type="button" class="btn-round-adjust" id="btn-fillin-minus">−</button>
+
+                <span id="fillin-count-label">5 câu</span>
+
+                <button type="button" class="btn-round-adjust" id="btn-fillin-plus">+</button>
+
+            </div>
+
+        </div>
+
+        <div class="answer-key-list" id="fillin-list"></div>
+
+    </div>
+
+    <!-- ================= Đáp án đúng (dùng để chấm điểm) ================= -->
+    <div class="answer-key-section" id="answer-key-section">
+
+        <div class="answer-key-header">
+
+            <h3 id="answer-key-title">✅ Đáp án đúng (để chấm điểm)</h3>
+
+            <div class="answer-count-control">
+
+                <button type="button" class="btn-round-adjust" id="btn-answer-minus">−</button>
+
+                <span id="answer-count-label">5 câu</span>
+
+                <button type="button" class="btn-round-adjust" id="btn-answer-plus">+</button>
+
+            </div>
+
+        </div>
+
+        <div class="answer-key-list" id="answer-key-list"></div>
+
+    </div>
+
+    <div class="action-bar">
+
+        <button
+            id="btn-back"
+            class="btn btn-secondary">
+
+            Back
+
+        </button>
+
+        <button
+            id="btn-next"
+            class="btn btn-primary">
+
+            Next
+
+        </button>
+
+        <button
+            id="btn-done"
+            class="btn btn-success">
+
+            Done
+
+        </button>
+
+    </div>
+
+</div>
+
+<!-- Modal -->
+
+<div
+    class="modal-overlay"
+    id="modal-confirm">
+
+    <div class="modal-box">
+
+        <h2>
+
+            Homework Name
+
+        </h2>
+
+        <input
+            id="homework-name"
+            type="text"
+            placeholder="Enter homework name...">
+
+        <div class="modal-buttons">
+
+            <button
+                id="btn-modal-cancel"
+                class="btn btn-secondary">
+
+                Cancel
+
+            </button>
+
+            <button
+                id="btn-modal-save"
+                class="btn btn-success">
+
+                Save
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div
+    id="toast-container"
+    class="toast-container">
+</div>
+
+<script src="../js/Add.js"></script>
+
+</body>
+</html>
